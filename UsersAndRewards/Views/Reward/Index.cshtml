@@ -1,0 +1,35 @@
+﻿@model List<RewardViewModel>
+@{
+    ViewData["Title"] = "Награды";
+}
+
+<h2>Список наград</h2>
+<div>
+    <a asp-controller="Reward" asp-action="Edit" asp-route-index="0">Создать награду</a>
+</div>
+<table class="table table-condensed table-striped  col-md-6">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Изображение</th>
+            <th>Название</th>
+            <th>Описание</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td><img src="@item.ImageUrl" height="35"/></td>
+                <td>@item.Title</td>
+                <td>@item.Description</td>
+                <td>
+                    <a asp-controller="Reward" asp-action="Edit" asp-route-index="@item.Id">Изменить</a> |
+                    <a asp-controller="Reward" asp-action="Delete" asp-route-index="@item.Id">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

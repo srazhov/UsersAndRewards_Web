@@ -1,0 +1,27 @@
+﻿@model RewardViewModel
+@{
+    ViewData["Title"] = "Редактирование Награды";
+}
+
+<form asp-controller="Reward" asp-action="Create" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <div class="form-group col-md-5">
+        <label for="title">Название:</label>
+        <input class="form-control" name="title" value="@Model.Title" />
+    </div>
+    <div class="form-group col-md-5">
+        <label for="description">Описание:</label>
+        <input class="form-control" name="description" type="text" value="@Model.Description" />
+    </div>
+    <div class="form-group col-md-5">
+        <label for="uploadFile">Изображение</label>
+        <input class="form-control-file" name="uploadFile" type="file" />
+        @if (Model.ImageUrl != null)
+        {
+            <a asp-controller="Reward" asp-action="RemoveImage" asp-route-index="@Model.Id">Удалить изображение</a>
+        }
+    </div>
+    <div class="panel-body">
+        <button type="submit" id="submit" class="btn btn-primary">Сохранить</button>
+    </div>
+</form>

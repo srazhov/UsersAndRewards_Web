@@ -1,0 +1,38 @@
+﻿@model List<UserViewModel>
+@{
+    ViewData["Title"] = "Пользователи";
+}
+
+<h2>Список пользователей</h2>
+<div>
+    <a asp-controller="User" asp-action="GetUsersFile">Скачать список</a>
+</div>
+<div>
+    <a asp-controller="User" asp-action="Edit" asp-route-index="0"> Создать пользователя</a>
+</div>
+<table class="table table-condensed table-striped  col-md-6">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Фото</th>
+            <th>Имя</th>
+            <th>возраст</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td><img src="@item.PhotoUrl" width="35" /></td>
+                <td>@item.Name</td>
+                <td>@item.Age</td>
+                <td>
+                    <a asp-controller="User" asp-action="Edit" asp-route-index="@item.Id">Изменить</a> |
+                    <a asp-controller="User" asp-action="Delete" asp-route-index="@item.Id">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
