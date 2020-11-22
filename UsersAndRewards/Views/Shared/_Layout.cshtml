@@ -34,6 +34,25 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            <div class="breadcrumb-container">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        @if (IsSectionDefined("Breads"))
+                        {
+                            <li class="breadcrumb-item">
+                                <a asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                            @RenderSection("Breads", required: false)
+                        }
+                        else
+                        {
+                            <li class="breadcrumb-item active" aria-current="page">
+                                Home
+                            </li>
+                        }
+                    </ol>
+                </nav>
+            </div>
             @RenderBody()
         </main>
     </div>

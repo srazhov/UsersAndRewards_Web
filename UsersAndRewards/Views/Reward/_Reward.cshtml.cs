@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace UsersAndRewards.Views.User
+namespace UsersAndRewards.Views.Reward
 {
-    public class ListModel : PageModel
+    public class _RewardModel : PageModel
     {
         public void OnGet()
         {

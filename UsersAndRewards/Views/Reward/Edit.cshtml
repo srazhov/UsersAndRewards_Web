@@ -1,9 +1,19 @@
 ﻿@model RewardViewModel
 @{
     ViewData["Title"] = "Редактирование Награды";
+    Layout = "_Reward.cshtml";
+}
+
+@section BreadLink {
+    <li class="breadcrumb-item">
+        <a asp-controller="User" asp-action="Index">User</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Edit</li>
 }
 
 <form asp-controller="Reward" asp-action="Create" method="post" enctype="multipart/form-data">
+    <h4>Создание/Редактирование Награды</h4>
+    <hr />
     <input type="hidden" name="id" value="@Model.Id" />
     <div class="form-group col-md-5">
         <label for="title">Название:</label>

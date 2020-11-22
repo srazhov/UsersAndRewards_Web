@@ -1,35 +1,44 @@
 ﻿@model List<RewardViewModel>
 @{
     ViewData["Title"] = "Награды";
+    Layout = "_Reward.cshtml";
+}
+
+@section BreadLink {
+    <li class="breadcrumb-item active" aria-current="page">User</li>
 }
 
 <h2>Список наград</h2>
-<div>
-    <a asp-controller="Reward" asp-action="Edit" asp-route-index="0">Создать награду</a>
+<div class="row">
+    <div class="col-md-6">
+        <a asp-controller="Reward" asp-action="Edit" asp-route-index="0">Создать награду</a>
+    </div>
 </div>
-<table class="table table-condensed table-striped  col-md-6">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Изображение</th>
-            <th>Название</th>
-            <th>Описание</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Id</td>
-                <td><img src="@item.ImageUrl" height="35"/></td>
-                <td>@item.Title</td>
-                <td>@item.Description</td>
-                <td>
-                    <a asp-controller="Reward" asp-action="Edit" asp-route-index="@item.Id">Изменить</a> |
-                    <a asp-controller="Reward" asp-action="Delete" asp-route-index="@item.Id">Удалить</a>
-                </td>
+<div class="container-fluid">
+    <table class="table table-condensed table-striped table-hover col-md-12">
+        <thead>
+            <tr class="d-flex">
+                <th class="col-1">Id</th>
+                <th class="col-3">Изображение</th>
+                <th class="col-3">Название</th>
+                <th class="col-3">Описание</th>
+                <th class="col-2"></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="d-flex">
+                    <td class="col-1">@item.Id</td>
+                    <td class="col-3"><img src="@item.ImageUrl" class="img-fluid" /></td>
+                    <td class="col-3">@item.Title</td>
+                    <td class="col-3">@item.Description</td>
+                    <td class="col-2">
+                        <a asp-controller="Reward" asp-action="Edit" asp-route-index="@item.Id">Изменить</a> |
+                        <a asp-controller="Reward" asp-action="Delete" asp-route-index="@item.Id">Удалить</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
