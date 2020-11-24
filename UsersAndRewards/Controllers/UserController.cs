@@ -39,19 +39,39 @@ namespace UsersAndRewards.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(UserViewModel userVM, IFormFile uploadFile)
         {
-            var item = _mapper.Map<User>(userVM);
+            if (userVM.Birthdate.Year < DateTime.Today.Year - 150 || DateTime.Today < userVM.Birthdate)
+            {
+                ModelState.AddModelError("", "Возраст пользователя не может быть больше 150 или быть отрицательным");
+            }
 
-            item.Photo = await CommonActions.CreateImage(_environment, uploadFile, "/imgs/user/");
+            if (!ModelState.IsValid)
+            {
+                return View("Edit", userVM);
+            }
+
+            var item = _mapper.Map<User>(userVM);
             if (item.Id == 0)
             {
                 _db.Add(item);
             }
             else
             {
+                item.Photo = await (from u in _db.Users.AsNoTracking()
+                             where u.Id == item.Id
+                             select u.Photo).SingleAsync();
                 _db.Entry(item).State = EntityState.Modified;
             }
 
             await _db.SaveChangesAsync();
+
+            if (uploadFile != null)
+            {
+                var photoUrl = await CommonActions.CreateImage(_environment, uploadFile, "/imgs/user/");
+                item.Photo = photoUrl ?? item.Photo;
+
+                _db.Entry(item).State = EntityState.Modified;
+                await _db.SaveChangesAsync();
+            }
 
             return RedirectToAction("Index");
         }
@@ -60,7 +80,7 @@ namespace UsersAndRewards.Controllers
         public async Task<IActionResult> Edit(int index)
         {
             var item = await _db.Users.FindAsync(index);
-            if(index == 0 || item == null)
+            if (index == 0 || item == null)
             {
                 //Создание нового пользователя, если Id == 0
                 var NewUser = new UserViewModel()
@@ -83,7 +103,7 @@ namespace UsersAndRewards.Controllers
         public async Task<IActionResult> Delete(int index)
         {
             var item = await _db.Users.FindAsync(index);
-            if(item != null)
+            if (item != null)
             {
                 _db.Users.Remove(item);
                 await _db.SaveChangesAsync();
@@ -97,7 +117,7 @@ namespace UsersAndRewards.Controllers
         public async Task<IActionResult> RemoveImage(int index)
         {
             var item = await _db.Users.FindAsync(index);
-            if(item != null)
+            if (item != null)
             {
                 item.Photo = null;
                 await _db.SaveChangesAsync();

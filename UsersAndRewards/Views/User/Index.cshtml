@@ -22,10 +22,10 @@
         <thead>
             <tr class="d-flex">
                 <th class="col-1">Id</th>
-                <th class="col-4">Фото</th>
+                <th class="col-2">Фото</th>
                 <th class="col-4">Имя</th>
                 <th class="col-1">возраст</th>
-                <th class="col-2"></th>
+                <th class="col-4"></th>
             </tr>
         </thead>
         <tbody>
@@ -33,10 +33,10 @@
             {
                 <tr class="d-flex">
                     <td class="col-1">@item.Id</td>
-                    <td class="col-4"><img src="@item.PhotoUrl" class="rounded img-fluid" /></td>
+                    <td class="col-2"><img src="@item.PhotoUrl" class="rounded img-fluid" /></td>
                     <td class="col-4">@item.Name</td>
                     <td class="col-1">@item.Age</td>
-                    <td class="col-2 text-md-right">
+                    <td class="col-4 text-md-right">
                         <a asp-controller="User" asp-action="Edit" asp-route-index="@item.Id">Изменить</a> |
                         <a asp-controller="User" asp-action="Delete" asp-route-index="@item.Id">Удалить</a>
                     </td>

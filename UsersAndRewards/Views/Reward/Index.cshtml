@@ -19,9 +19,9 @@
         <thead>
             <tr class="d-flex">
                 <th class="col-1">Id</th>
-                <th class="col-3">Изображение</th>
+                <th class="col-2">Изображение</th>
                 <th class="col-3">Название</th>
-                <th class="col-3">Описание</th>
+                <th class="col-4">Описание</th>
                 <th class="col-2"></th>
             </tr>
         </thead>
@@ -30,9 +30,9 @@
             {
                 <tr class="d-flex">
                     <td class="col-1">@item.Id</td>
-                    <td class="col-3"><img src="@item.ImageUrl" class="img-fluid" /></td>
+                    <td class="col-2"><img src="@item.ImageUrl" class="img-fluid" /></td>
                     <td class="col-3">@item.Title</td>
-                    <td class="col-3">@item.Description</td>
+                    <td class="col-4">@item.Description</td>
                     <td class="col-2">
                         <a asp-controller="Reward" asp-action="Edit" asp-route-index="@item.Id">Изменить</a> |
                         <a asp-controller="Reward" asp-action="Delete" asp-route-index="@item.Id">Удалить</a>

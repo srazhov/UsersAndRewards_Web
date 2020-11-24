@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -36,18 +37,38 @@ namespace UsersAndRewards.Controllers
         public async Task<IActionResult> Create(RewardViewModel rewardVm, IFormFile uploadFile)
         {
             var item = _mapper.Map<Reward>(rewardVm);
-
-            item.Image = await CommonActions.CreateImage(_environment, uploadFile, "/imgs/reward/");
             if (item.Id == 0)
             {
                 _db.Add(item);
             }
             else
             {
+                item.Image = await (from r in _db.Rewards.AsNoTracking()
+                                    where r.Id == item.Id
+                                    select r.Image).SingleAsync();
                 _db.Entry(item).State = EntityState.Modified;
             }
 
+            if (string.IsNullOrEmpty(item.Image) && uploadFile == null || !ModelState.IsValid)
+            {
+                if (ModelState.IsValid)
+                {
+                    ModelState.AddModelError("", "Добавьте изображение");
+                }
+
+                return View("Edit", rewardVm);
+            }
+
             await _db.SaveChangesAsync();
+
+            if (uploadFile != null)
+            {
+                var photoUrl = await CommonActions.CreateImage(_environment, uploadFile, "/imgs/reward/");
+                item.Image = photoUrl ?? item.Image;
+
+                _db.Entry(item).State = EntityState.Modified;
+                await _db.SaveChangesAsync();
+            }
 
             return RedirectToAction("Index");
         }
