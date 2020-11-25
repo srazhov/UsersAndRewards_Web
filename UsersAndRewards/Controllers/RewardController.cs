@@ -26,10 +26,24 @@ namespace UsersAndRewards.Controllers
             _environment = webHost;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id)
         {
-            var items = _mapper.Map<List<RewardViewModel>>(await _db.Rewards.ToListAsync());
-            
+            List<RewardViewModel> items;
+            if (id != null)
+            {
+                var reward = await _db.Rewards.FindAsync(id);
+                if (reward == null)
+                {
+                    return NotFound();
+                }
+
+                items = new List<RewardViewModel>() { _mapper.Map<RewardViewModel>(reward) };
+            }
+            else
+            {
+                items = _mapper.Map<List<RewardViewModel>>(await _db.Rewards.ToListAsync());
+            }
+
             return View(items);
         }
 
@@ -108,6 +122,38 @@ namespace UsersAndRewards.Controllers
             }
 
             return NotFound();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RewardUser(int userIndex, int rewardIndex)
+        {
+            if (rewardIndex == 0)
+            {
+                ViewBag.RewardSelector = userIndex;
+                var items = _mapper.Map<List<RewardViewModel>>(await _db.Rewards.ToListAsync());
+
+                return View("Index", items);
+            }
+
+            var user = await _db.Users.FindAsync(userIndex);
+            var reward = await _db.Rewards.FindAsync(rewardIndex);
+            if (user == null || reward == null)
+            {
+                return NotFound();
+            }
+
+            var result = from u in _db.Users
+                         where u.Id == userIndex
+                         where u.Rewards.Any(r => r.Id == rewardIndex)
+                         select u;
+            if (result.Any())
+            {
+                return Content("Нельзя награждать одной и той же наградой дважды");
+            }
+
+            user.Rewards.Add(reward);
+            await _db.SaveChangesAsync();
+            return RedirectToAction("Index", "User");
         }
 
         [HttpGet]

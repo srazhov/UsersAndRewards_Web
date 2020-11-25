@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UsersAndRewards.Database;
 
 namespace UsersAndRewards.Migrations
 {
     [DbContext(typeof(URContext))]
-    partial class URContextModelSnapshot : ModelSnapshot
+    [Migration("20201124155129_AddedManyToMany_UserReward_Table")]
+    partial class AddedManyToMany_UserReward_Table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

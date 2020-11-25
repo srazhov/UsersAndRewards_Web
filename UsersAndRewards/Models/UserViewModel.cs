@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace UsersAndRewards.Models
@@ -17,5 +18,7 @@ namespace UsersAndRewards.Models
         public int Age { get => DateTime.Now.Year - Birthdate.Year; }
 
         public string PhotoUrl { get; set; }
+
+        public List<RewardViewModel> RewardsVM { get; set; }
     }
 }

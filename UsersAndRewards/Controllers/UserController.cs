@@ -31,7 +31,7 @@ namespace UsersAndRewards.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var items = _mapper.Map<List<UserViewModel>>(await _db.Users.ToListAsync());
+            var items = _mapper.Map<List<UserViewModel>>(await _db.Users.Include(u => u.Rewards.Take(4)).ToListAsync());
 
             return View(items);
         }
@@ -57,8 +57,8 @@ namespace UsersAndRewards.Controllers
             else
             {
                 item.Photo = await (from u in _db.Users.AsNoTracking()
-                             where u.Id == item.Id
-                             select u.Photo).SingleAsync();
+                                    where u.Id == item.Id
+                                    select u.Photo).SingleAsync();
                 _db.Entry(item).State = EntityState.Modified;
             }
 
@@ -132,20 +132,35 @@ namespace UsersAndRewards.Controllers
         [HttpGet]
         public async Task<FileResult> GetUsersFile()
         {
-            var rawUsers = await _db.Users.ToListAsync();
+            var rawUsers = await _db.Users.Include(u => u.Rewards).ToListAsync();
             var users = _mapper.Map<List<UserViewModel>>(rawUsers);
             var result = new StringBuilder(users.Count * 100);
 
             foreach (var user in users)
             {
-                result.Append($"{user.Name} -- {user.Birthdate.ToShortDateString()} -- {user.Age} y.o \n");
+                string resString = $"{user.Name} -- {user.Birthdate.ToShortDateString()} -- {user.Age} y.o ";
+                if (!user.RewardsVM.Any())
+                {
+                    resString += "/// Пользователь не имеет наград /// ";
+                }
+                else
+                {
+                    StringBuilder rewResult = new StringBuilder(user.RewardsVM.Count * 50);
+                    foreach (var rew in user.RewardsVM)
+                    {
+                        rewResult.Append($"{rew.Title}, ");
+                    }
+
+                    resString += $"/// {rewResult} /// ";
+                }
+
+                result.Append(resString + "\n");
             }
 
             FileInfo fileInfo = new FileInfo("Users data");
-            if (!fileInfo.Exists)
+            using (var sw = fileInfo.CreateText())
             {
-                using var sw = fileInfo.CreateText();
-                sw.Write(result);
+                await sw.WriteAsync(result);
             }
 
             return File(fileInfo.OpenRead(), System.Net.Mime.MediaTypeNames.Application.Octet, "Users Data.txt");

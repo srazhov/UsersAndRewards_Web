@@ -34,8 +34,21 @@
                     <td class="col-3">@item.Title</td>
                     <td class="col-4">@item.Description</td>
                     <td class="col-2">
-                        <a asp-controller="Reward" asp-action="Edit" asp-route-index="@item.Id">Изменить</a> |
-                        <a asp-controller="Reward" asp-action="Delete" asp-route-index="@item.Id">Удалить</a>
+                        @if (ViewBag.RewardSelector == null)
+                        {
+                            <div class="links-container">
+                                <a asp-controller="Reward" asp-action="Edit" asp-route-index="@item.Id">Изменить</a> |
+                                <a asp-controller="Reward" asp-action="Delete" asp-route-index="@item.Id">Удалить</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="links-container">
+                                <a asp-controller="Reward" asp-action="RewardUser" asp-route-userIndex="@ViewBag.RewardSelector" asp-route-rewardIndex="@item.Id">
+                                    Наградить этим
+                                </a>
+                            </div>
+                        }
                     </td>
                 </tr>
             }
