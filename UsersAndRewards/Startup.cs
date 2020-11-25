@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -16,8 +17,22 @@ namespace UsersAndRewards
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment webHost)
         {
+            var paths = new string[]
+            {
+                @webHost.WebRootPath + @"/imgs/reward",
+                @webHost.WebRootPath + @"/imgs/user"
+            };
+
+            foreach (var path in paths)
+            {
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+            }
+
             Configuration = configuration;
         }
 

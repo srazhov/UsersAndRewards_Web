@@ -350,5 +350,4 @@ MigrationBackup/
 .ionide/
 
 # wwwroot user images
-UsersAndRewards/wwwroot/imgs/reward/
-UsersAndRewards/wwwroot/imgs/user/
+UsersAndRewards/wwwroot/imgs/
