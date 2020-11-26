@@ -29,11 +29,59 @@ namespace UsersAndRewards.Controllers
             _environment = webHost;
         }
 
+        [Route("users")]
         public async Task<IActionResult> Index()
         {
             var items = _mapper.Map<List<UserViewModel>>(await _db.Users.Include(u => u.Rewards.Take(4)).ToListAsync());
 
             return View(items);
+        }
+
+        [Route("users/{letter:maxlength(1)}")]
+        public IActionResult GetUsersByLetter(string letter)
+        {
+            var items = from u in _db.Users
+                        where u.Name.StartsWith(letter)
+                        select u;
+            var mappeds = _mapper.Map<List<UserViewModel>>(items);
+
+            return View("Index", mappeds);
+        }
+
+        [Route("users/{name:minlength(2)}")]
+        public IActionResult GetUsersByName(string name)
+        {
+            var items = from u in _db.Users
+                        where u.Name.StartsWith(name) || u.Name.EndsWith(name)
+                        select u;
+            var mappeds = _mapper.Map<List<UserViewModel>>(items);
+
+            return View("Index", mappeds);
+        }
+
+        [Route("user/{index=0}")]
+        public IActionResult GetUser(int index)
+        {
+            var item = _mapper.Map<List<UserViewModel>>(_db.Users.Where(u => u.Id == index).Include(u => u.Rewards));
+
+            return View("Index", item);
+        }
+
+        [Route("user/{name:minlength(2)}")]
+        public async Task<IActionResult> GetUserByName(string name)
+        {
+            var item = await (from u in _db.Users
+                              where u.Name == name
+                              orderby u.Birthdate
+                              select u).FirstOrDefaultAsync();
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            var mappeds = _mapper.Map<UserViewModel>(item);
+
+            return View("Index", new List<UserViewModel>() { mappeds });
         }
 
         [HttpPost]
@@ -66,8 +114,7 @@ namespace UsersAndRewards.Controllers
 
             if (uploadFile != null)
             {
-                var photoUrl = await CommonActions.CreateImage(_environment, uploadFile, "/imgs/user/");
-                item.Photo = photoUrl ?? item.Photo;
+                item.Photo = await CommonActions.CreateImage(_environment, uploadFile, "/imgs/user/");
 
                 _db.Entry(item).State = EntityState.Modified;
                 await _db.SaveChangesAsync();
@@ -76,22 +123,29 @@ namespace UsersAndRewards.Controllers
             return RedirectToAction("Index");
         }
 
+        [Route("create-user")]
+        [HttpGet]
+        public IActionResult Create()
+        {
+            var NewUser = new UserViewModel()
+            {
+                Id = 0,
+                Name = string.Empty,
+                Birthdate = DateTime.Now,
+                PhotoUrl = null
+            };
+
+            return View("Edit", NewUser);
+        }
+
+        [Route("user/{index=0}/edit")]
         [HttpGet]
         public async Task<IActionResult> Edit(int index)
         {
             var item = await _db.Users.FindAsync(index);
-            if (index == 0 || item == null)
+            if(item == null)
             {
-                //Создание нового пользователя, если Id == 0
-                var NewUser = new UserViewModel()
-                {
-                    Id = 0,
-                    Name = string.Empty,
-                    Birthdate = DateTime.Now,
-                    PhotoUrl = null
-                };
-
-                return View(NewUser);
+                return NotFound();
             }
 
             var result = _mapper.Map<UserViewModel>(item);
@@ -99,6 +153,7 @@ namespace UsersAndRewards.Controllers
             return View(result);
         }
 
+        [Route("user/{index=0}/delete")]
         [HttpGet]
         public async Task<IActionResult> Delete(int index)
         {
