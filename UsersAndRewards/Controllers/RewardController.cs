@@ -26,25 +26,59 @@ namespace UsersAndRewards.Controllers
             _environment = webHost;
         }
 
-        public async Task<IActionResult> Index(int? id)
+        [Route("awards")]
+        public async Task<IActionResult> Index()
         {
-            List<RewardViewModel> items;
-            if (id != null)
-            {
-                var reward = await _db.Rewards.FindAsync(id);
-                if (reward == null)
-                {
-                    return NotFound();
-                }
-
-                items = new List<RewardViewModel>() { _mapper.Map<RewardViewModel>(reward) };
-            }
-            else
-            {
-                items = _mapper.Map<List<RewardViewModel>>(await _db.Rewards.ToListAsync());
-            }
+            var items = _mapper.Map<List<RewardViewModel>>(await _db.Rewards.ToListAsync());
 
             return View(items);
+        }
+
+        [Route("awards/{letter:maxlength(1)}")]
+        public IActionResult GetRewardsByLetter(string letter)
+        {
+            var items = from u in _db.Rewards
+                        where u.Title.StartsWith(letter)
+                        select u;
+            var mappeds = _mapper.Map<List<RewardViewModel>>(items);
+
+            return View("Index", mappeds);
+        }
+
+        [Route("awards/{name:minlength(2)}")]
+        public IActionResult GetRewardsByWord(string name)
+        {
+            var items = from u in _db.Rewards
+                        where u.Title.Contains(name)
+                        select u;
+            var mappeds = _mapper.Map<List<RewardViewModel>>(items);
+
+            return View("Index", mappeds);
+        }
+
+        [Route("award/{name:minlength(2)}")]
+        public IActionResult GetRewardsByName(string name)
+        {
+            name = name.Replace("_", " ");
+            var items = (from u in _db.Rewards
+                         where u.Title == name
+                         select u).Take(1);
+            var mappeds = _mapper.Map<List<RewardViewModel>>(items);
+
+            return View("Index", mappeds);
+        }
+
+        [Route("award/{id=0}")]
+        public async Task<IActionResult> GetItem(int id)
+        {
+            var reward = await _db.Rewards.FindAsync(id);
+            if (reward == null)
+            {
+                return NotFound();
+            }
+
+            var items = new List<RewardViewModel>() { _mapper.Map<RewardViewModel>(reward) };
+            return View("Index", items);
         }
 
         [HttpPost]
@@ -87,22 +121,29 @@ namespace UsersAndRewards.Controllers
             return RedirectToAction("Index");
         }
 
+        [Route("create-award")]
+        [HttpGet]
+        public IActionResult Create()
+        {
+            var NewReward = new RewardViewModel()
+            {
+                Id = 0,
+                Title = string.Empty,
+                Description = string.Empty,
+                ImageUrl = null
+            };
+
+            return View("Edit", NewReward);
+        }
+
+        [Route("award/{index=0}/edit")]
         [HttpGet]
         public async Task<IActionResult> Edit(int index)
         {
             var item = await _db.Rewards.FindAsync(index);
-            if (index == 0 || item == null)
+            if (item == null)
             {
-                //Создание новой награды, если Id == 0
-                var NewReward = new RewardViewModel()
-                {
-                    Id = 0,
-                    Title = string.Empty,
-                    Description = string.Empty,
-                    ImageUrl = null
-                };
-
-                return View(NewReward);
+                return NotFound();
             }
 
             var result = _mapper.Map<RewardViewModel>(item);
@@ -110,6 +151,7 @@ namespace UsersAndRewards.Controllers
             return View(result);
         }
 
+        [Route("award/{index=0}/delete")]
         [HttpGet]
         public async Task<IActionResult> Delete(int index)
         {
@@ -122,6 +164,28 @@ namespace UsersAndRewards.Controllers
             }
 
             return NotFound();
+        }
+
+        [Route("award-user/{ids}")]
+        public IActionResult RewardUserByIds(string ids)
+        {
+            var splitValues = ids.Split("_");
+            if(splitValues.Length != 2)
+            {
+                return NotFound();
+            }
+
+            if (!int.TryParse(splitValues[0], out int user))
+            {
+                user = 0;
+            }
+
+            if(!int.TryParse(splitValues[1], out int reward))
+            {
+                reward = 0;
+            }
+
+            return RedirectToAction("RewardUser", new { userIndex = user, rewardIndex = reward });
         }
 
         [HttpGet]

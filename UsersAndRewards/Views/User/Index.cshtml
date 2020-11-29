@@ -42,7 +42,7 @@
                             @foreach (var rew in item.RewardsVM)
                             {
                                 <div class="col">
-                                    <a asp-controller="Reward" asp-action="Index" asp-route-id="@rew.Id" target="_blank">
+                                    <a asp-controller="Reward" asp-action="GetItem" asp-route-id="@rew.Id" target="_blank">
                                         <img src="@rew.ImageUrl" title="@rew.Title" class="rounded img-fluid" />
                                     </a>
                                 </div>

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using UsersAndRewards.Database;
+using UsersAndRewards.Filters;
 
 namespace UsersAndRewards
 {
@@ -48,7 +49,10 @@ namespace UsersAndRewards
             IMapper mapper = mapperconfig.CreateMapper();
             services.AddSingleton(mapper);
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add(typeof(ProtocolUser));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

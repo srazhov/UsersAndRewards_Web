@@ -70,6 +70,7 @@ namespace UsersAndRewards.Controllers
         [Route("user/{name:minlength(2)}")]
         public async Task<IActionResult> GetUserByName(string name)
         {
+            name = name.Replace('_', ' ');
             var item = await (from u in _db.Users
                               where u.Name == name
                               orderby u.Birthdate
