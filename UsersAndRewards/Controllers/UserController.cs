@@ -85,6 +85,7 @@ namespace UsersAndRewards.Controllers
             return View("Index", new List<UserViewModel>() { mappeds });
         }
 
+        [Route("create-user")]
         [HttpPost]
         public async Task<IActionResult> Create(UserViewModel userVM, IFormFile uploadFile)
         {

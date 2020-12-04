@@ -81,6 +81,7 @@ namespace UsersAndRewards.Controllers
             return View("Index", items);
         }
 
+        [Route("create-award")]
         [HttpPost]
         public async Task<IActionResult> Create(RewardViewModel rewardVm, IFormFile uploadFile)
         {
